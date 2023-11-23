@@ -53,13 +53,15 @@ class RDTSender:
         }
         return pkt_clone
 
+    def seqGetter(self):
+        return self.sequence
     @staticmethod
     def is_corrupted(reply):
         """ Check if the received reply from receiver is corrupted or not
         :param reply: a python dictionary represent a reply sent by the receiver
         :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
         """
-        return (RDTSender.sequence != reply['ack'] or
+        return (seqGetter(self) != reply['ack'] or
                 reply['checksum'] != ord(RDTSender.sequence))
         pass
 
@@ -97,7 +99,16 @@ class RDTSender:
         for data in process_buffer:
             checksum = RDTSender.get_checksum(data)
             pkt = RDTSender.make_pkt(self.sequence, data, checksum)
+            clonedPacket = self.clone_packet(pkt)
             reply = self.net_srv.udt_send(pkt)
+            while True:
+                if RDTSender.is_corrupted(reply):
+                    reply = self.net_srv.udt_send(clonedPacket)
+                elif not RDTSender.is_expected_seq(reply, self.sequence):
+                    reply = self.net_srv.udt_send(clonedPacket)
+                else:
+                    self.sequence = '0' if self.sequence == '1' else '1'
+                    break
 
         print(f'Sender Done!')
         return
