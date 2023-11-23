@@ -59,8 +59,8 @@ class RDTSender:
         :param reply: a python dictionary represent a reply sent by the receiver
         :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
         """
-
-        # TODO provide your own implementation
+        return (RDTSender.sequence != reply['ack'] or
+                reply['checksum'] != ord(RDTSender.sequence))
         pass
 
     @staticmethod
@@ -70,7 +70,7 @@ class RDTSender:
         :param exp_seq: the sender expected sequence number '0' or '1' represented as a character
         :return: True -> if ack in the reply match the   expected sequence number otherwise False
         """
-        # TODO provide your own implementation
+        return reply['ack'] == exp_seq
         pass
 
     @staticmethod
@@ -93,10 +93,8 @@ class RDTSender:
         :param process_buffer:  a list storing the message the sender process wish to send to the receiver process
         :return: terminate without returning any value
         """
-
         # for every character in the buffer
         for data in process_buffer:
-
             checksum = RDTSender.get_checksum(data)
             pkt = RDTSender.make_pkt(self.sequence, data, checksum)
             reply = self.net_srv.udt_send(pkt)

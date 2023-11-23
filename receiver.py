@@ -32,6 +32,8 @@ class RDTReceiver:
             :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
         """
         # TODO provide your own implementation
+        return (RDTReceiver.sequence != packet['sequence_number']
+                or packet['checksum'] != ord(RDTReceiver.sequence))
         pass
 
     @staticmethod
@@ -42,6 +44,7 @@ class RDTReceiver:
          :return: True -> if ack in the reply match the   expected sequence number otherwise False
         """
         # TODO provide your own implementation
+        return rcv_pkt['sequence_number'] == exp_seq
         pass
 
 
