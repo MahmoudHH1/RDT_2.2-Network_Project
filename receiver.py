@@ -25,15 +25,18 @@ class RDTReceiver:
     def __init__(self):
         self.sequence = '0'
 
+    def get_sequence(self):
+        return self.sequence
+
     @staticmethod
-    def is_corrupted(packet):
+    def is_corrupted(packet ,self):
         """ Check if the received packet from sender is corrupted or not
             :param packet: a python dictionary represent a packet received from the sender
             :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
         """
         # TODO provide your own implementation
-        return (RDTReceiver.sequence != packet['sequence_number']
-                or packet['checksum'] != ord(RDTReceiver.sequence))
+        return (RDTReceiver.get_sequence(self) != packet['sequence_number']
+                or packet['checksum'] != ord(RDTReceiver.get_sequence(self)))
         pass
 
     @staticmethod
@@ -66,8 +69,16 @@ class RDTReceiver:
         :param rcv_pkt: a packet delivered by the network layer 'udt_send()' to the receiver
         :return: the reply packet
         """
-
         # TODO provide your own implementation
+        if self.is_corrupted(rcv_pkt,self):
+            rec_seq_num = rcv_pkt['sequence_number']
+            new_seq_num = ' '
+            if ord(rec_seq_num) == 49: # if 1 change to 0
+                new_seq_num ='0'
+            else :
+                new_seq_num ='1'
+            new_reply_pkt = self.make_reply_pkt(new_seq_num , ord(new_seq_num))
+
 
         # deliver the data to the process in the application layer
         ReceiverProcess.deliver_data(rcv_pkt['data'])
