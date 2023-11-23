@@ -37,8 +37,7 @@ class RDTSender:
         :param data: one and only one character, for example data = 'A'
         :return: the ASCII code of the character, for example ASCII('A') = 65
         """
-        # TODO provide your own implementation
-        checksum = None  # you need to change that
+        checksum = ord(data)  # you need to change that
         return checksum
 
     @staticmethod
@@ -60,6 +59,7 @@ class RDTSender:
         :param reply: a python dictionary represent a reply sent by the receiver
         :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
         """
+
         # TODO provide your own implementation
         pass
 
