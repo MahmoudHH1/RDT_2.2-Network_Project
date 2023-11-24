@@ -25,7 +25,7 @@ class RDTSender:
 
     def __init__(self, net_srv):
         """ This is a class constructor
-            It initialize the RDT sender sequence number  to '0' and the network layer services
+            It initializes the RDT sender sequence number  to '0' and the network layer services
             The network layer service provide the method udt_send(send_pkt)
         """
         self.sequence = '0'
@@ -53,17 +53,19 @@ class RDTSender:
         }
         return pkt_clone
 
-    def seqGetter(self):
+    def get_sequence(self):
         return self.sequence
+
     @staticmethod
-    def is_corrupted(reply):
+    def is_corrupted(reply, self):
         """ Check if the received reply from receiver is corrupted or not
         :param reply: a python dictionary represent a reply sent by the receiver
         :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
         """
-        return (seqGetter(self) != reply['ack'] or
-                reply['checksum'] != ord(RDTSender.sequence))
+        return (RDTSender.get_sequence(self) != reply['ack'] or
+                reply['checksum'] != ord(RDTSender.get_sequence(self)))
         pass
+
 
     @staticmethod
     def is_expected_seq(reply, exp_seq):
@@ -101,10 +103,11 @@ class RDTSender:
             pkt = RDTSender.make_pkt(self.sequence, data, checksum)
             clonedPacket = self.clone_packet(pkt)
             reply = self.net_srv.udt_send(pkt)
+            sent = False
             while True:
-                if RDTSender.is_corrupted(reply):
+                if self.is_corrupted(reply, self):
                     reply = self.net_srv.udt_send(clonedPacket)
-                elif not RDTSender.is_expected_seq(reply, self.sequence):
+                elif not self.is_expected_seq(reply, self):
                     reply = self.net_srv.udt_send(clonedPacket)
                 else:
                     self.sequence = '0' if self.sequence == '1' else '1'
