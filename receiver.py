@@ -1,4 +1,6 @@
 from colorama import init, Fore
+
+
 class ReceiverProcess:
     """ Represent the receiver process in the application layer  """
     __buffer = list()
@@ -36,8 +38,8 @@ class RDTReceiver:
             :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
         """
         # TODO provide your own implementation
-        #print(packet['checksum'], "checksum11")
-        #print(ord(packet['data']), "ascii ack11")
+        # print(packet['checksum'], "checksum11")
+        # print(ord(packet['data']), "ascii ack11")
         return (not self.is_expected_seq(packet, self.sequence)
                 or packet['checksum'] != ord(packet['data']))
         pass
@@ -50,8 +52,8 @@ class RDTReceiver:
          :return: True -> if ack in the reply match the   expected sequence number otherwise False
         """
         # TODO provide your own implementation
-        #print(rcv_pkt['sequence_number'] ,"ack reply11")
-        #print(exp_seq , "expected seq11")
+        # print(rcv_pkt['sequence_number'] ,"ack reply11")
+        # print(exp_seq , "expected seq11")
         return rcv_pkt['sequence_number'] == exp_seq
         pass
 
@@ -76,8 +78,10 @@ class RDTReceiver:
         # TODO provide your own implementation
         reply_pkt = {}
         rec_seq_num = ''
-        #if self.is_corrupted(rcv_pkt, self):
-        if rcv_pkt['checksum'] != ord(rcv_pkt['data']):
+        # if self.is_corrupted(rcv_pkt, self):
+        if not (rcv_pkt['checksum'] == ord(rcv_pkt['data']) or
+                                      (not rcv_pkt['sequence_number'] == 1 or
+                                       not rcv_pkt['sequence_number'] == 0)):
             print(f"{Fore.RED}network_layer: corruption occurred {rcv_pkt} {Fore.RESET} ")
             corr_ack_seq_detector = '0' if self.sequence == '1' else '1'
             rec_seq_num = self.sequence
