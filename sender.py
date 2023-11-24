@@ -104,11 +104,13 @@ class RDTSender:
             clonedPacket = self.clone_packet(pkt)
             reply = self.net_srv.udt_send(pkt)
             sent = False
-            while True:
+            while self.is_corrupted(reply, self):
                 if self.is_corrupted(reply, self):
                     reply = self.net_srv.udt_send(clonedPacket)
+                    print(reply)
                 elif not self.is_expected_seq(reply, self):
                     reply = self.net_srv.udt_send(clonedPacket)
+                    print(reply)
                 else:
                     self.sequence = '0' if self.sequence == '1' else '1'
                     break

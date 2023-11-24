@@ -80,7 +80,7 @@ class RDTReceiver:
 
         reply_pkt = self.make_reply_pkt(new_seq_num, ord(new_seq_num))
 
-        if not self.is_expected_seq(reply_pkt , rcv_pkt['sequence_number']):
+        #if not self.is_expected_seq(reply_pkt , rcv_pkt['sequence_number']):
 
 
 
