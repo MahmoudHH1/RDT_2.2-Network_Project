@@ -65,8 +65,8 @@ class RDTSender:
         :param reply: a python dictionary represent a reply sent by the receiver
         :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
         """
-       # print(reply['checksum'] , "checksum1")
-        #print(ord(reply['ack'] ), "ascii ack1" )
+        # print(reply['checksum'] , "checksum1")
+        # print(ord(reply['ack'] ), "ascii ack1" )
         return ((reply['checksum'] != ord(reply['ack'])
                  or not self.is_expected_seq(reply, self.sequence)))
         pass
@@ -78,8 +78,8 @@ class RDTSender:
         :param exp_seq: the sender expected sequence number '0' or '1' represented as a character
         :return: True -> if ack in the reply match the   expected sequence number otherwise False
         """
-        #print(reply['ack'] , "ack reply1")
-        #print(exp_seq , "expected seq1")
+        # print(reply['ack'] , "ack reply1")
+        # print(exp_seq , "expected seq1")
         return reply['ack'] == exp_seq
         pass
 
@@ -111,20 +111,21 @@ class RDTSender:
             print(f"{Fore.BLUE}Sender: expected sequence number:{Fore.RESET} {self.sequence}")
             print(f"{Fore.BLUE}Sender: sending:{Fore.RESET} {pkt}")
             reply = self.net_srv.udt_send(pkt)
-           # print(reply['checksum'], "checksum3")
-            #print(ord(reply['ack']), "ascii ack3")
-            if not ord(reply['ack']) == reply['checksum'] : # reply corrupted
-                print(f"{Fore.RED}network_layer: corruption occurred {reply} {Fore.RESET} ")
+            # print(reply['checksum'], "checksum3")
+            # print(ord(reply['ack']), "ascii ack3")
+            seqNumBeforeCorruption = self.sequence
+            #if not ord(reply['ack']) == reply['checksum']:  # reply corrupted
+            #    print(f"{Fore.RED}network_layer: corruption occurred {reply} {Fore.RESET} ")
             print(f"{Fore.BLUE}Sender: received :{Fore.RESET} {reply} ")
-
-            while ((not self.is_expected_seq(reply, self.sequence) )or
-                   not ord(reply['ack']) == reply['checksum'] ):
+            while ((not self.is_expected_seq(reply, self.sequence)) or
+                   (not ord(reply['ack']) == reply['checksum'])):
                 print(f"{Fore.BLUE}Sender: expected sequence number:{Fore.RESET} {clonedPacket['sequence_number']}")
                 print(f"{Fore.BLUE}Sender: sending:{Fore.RESET} {clonedPacket}")
-                reply = self.net_srv.udt_send(clonedPacket)
-                if self.is_corrupted(reply, self):
-                    print(f"{Fore.RED}network_layer: corruption occurred {reply} {Fore.RESET} ")
+                pkt = self.clone_packet(clonedPacket)
+                reply = self.net_srv.udt_send(pkt)
+            #    if self.is_corrupted(reply, self):
+            #        print(f"{Fore.RED}network_layer: corruption occurred {reply} {Fore.RESET} ")
                 print(f"{Fore.BLUE}Sender: received :{Fore.RESET} {reply} ")
-            self.sequence = '0' if self.sequence == '1' else '1'
+            self.sequence = '0' if seqNumBeforeCorruption == '1' else '1'
         print(f'Sender Done!')
         return

@@ -1,5 +1,8 @@
 import random
 import time
+
+from colorama import Fore
+
 from receiver import RDTReceiver
 
 """
@@ -86,7 +89,7 @@ class NetworkLayer:
         if r_test and self.ack_corrupt:
             self.__corrupt_reply()
 
-        #if (r_test and self.ack_corrupt) or (s_test and self.pkt_corrupt):
-            #  print(f"corruption occured {frame}")
+        if (r_test and self.ack_corrupt) or (s_test and self.pkt_corrupt):
+            print(f"{Fore.RED}corruption occured {frame}")
 
         return self.reply

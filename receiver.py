@@ -80,14 +80,14 @@ class RDTReceiver:
         rec_seq_num = ''
         # if self.is_corrupted(rcv_pkt, self):
         if not (rcv_pkt['checksum'] == ord(rcv_pkt['data']) or
-                                      (not rcv_pkt['sequence_number'] == 1 or
-                                       not rcv_pkt['sequence_number'] == 0)):
-            print(f"{Fore.RED}network_layer: corruption occurred {rcv_pkt} {Fore.RESET} ")
+                (rcv_pkt['sequence_number'] not in {'0', '1'})):
+            #print(f"{Fore.RED}network_layer: corruption occurred {rcv_pkt} {Fore.RESET} ")
             corr_ack_seq_detector = '0' if self.sequence == '1' else '1'
             rec_seq_num = self.sequence
             reply_pkt = self.make_reply_pkt(corr_ack_seq_detector,
                                             ord(corr_ack_seq_detector))
         else:
+            ReceiverProcess.deliver_data(rcv_pkt['data'])
             rec_seq_num = rcv_pkt['sequence_number']
             reply_pkt = self.make_reply_pkt(rec_seq_num,
                                             ord(rec_seq_num))
@@ -97,5 +97,5 @@ class RDTReceiver:
         print(f"{Fore.GREEN}Receiver: reply with{Fore.RESET}: {reply_pkt}")
 
         # deliver the data to the process in the application layer
-        ReceiverProcess.deliver_data(rcv_pkt['data'])
+
         return reply_pkt
