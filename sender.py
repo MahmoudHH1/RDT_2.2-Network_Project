@@ -1,4 +1,6 @@
 from colorama import init, Fore
+
+
 class SenderProcess:
     """ Represent the sender process in the application layer  """
 
@@ -102,18 +104,20 @@ class RDTSender:
             checksum = RDTSender.get_checksum(data)
             pkt = RDTSender.make_pkt(self.sequence, data, checksum)
             clonedPacket = self.clone_packet(pkt)
-
             print(f"{Fore.BLUE}Sender: expected sequence number:{Fore.RESET} {self.sequence}")
             print(f"{Fore.BLUE}Sender: sending:{Fore.RESET} {pkt}")
             reply = self.net_srv.udt_send(pkt)
+            if self.is_corrupted(reply, self):
+                print(f"{Fore.RED}network_layer: corruption occurred {reply} {Fore.RESET} ")
             print(f"{Fore.BLUE}Sender: received :{Fore.RESET} {reply} ")
-            sent = False
-            while not sent:
-                if self.is_corrupted(reply, self) or not checksum:
-                    reply = self.net_srv.udt_send(clonedPacket)
-                    print(f"{Fore.BLUE}Sender: received :{Fore.RESET} {reply} ")
-                else:
-                    self.sequence = '0' if self.sequence == '1' else '1'
-                    sent = True
+
+            while (not self.is_expected_seq(reply, self.sequence) ):
+                print(f"{Fore.BLUE}Sender: expected sequence number:{Fore.RESET} {clonedPacket['sequence_number']}")
+                print(f"{Fore.BLUE}Sender: sending:{Fore.RESET} {clonedPacket}")
+                reply = self.net_srv.udt_send(clonedPacket)
+                if self.is_corrupted(reply, self):
+                    print(f"{Fore.RED}network_layer: corruption occurred {reply} {Fore.RESET} ")
+                print(f"{Fore.BLUE}Sender: received :{Fore.RESET} {reply} ")
+            self.sequence = '0' if self.sequence == '1' else '1'
         print(f'Sender Done!')
         return

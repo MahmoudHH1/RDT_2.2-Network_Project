@@ -71,12 +71,13 @@ class RDTReceiver:
         """
         # TODO provide your own implementation
         reply_pkt = {}
+        rec_seq_num = ''
         if self.is_corrupted(rcv_pkt, self):
             print(f"{Fore.RED}network_layer: corruption occurred {rcv_pkt} {Fore.RESET} ")
-            self.sequence = '0' if self.sequence == '1' else '1'
-            print(f"after corruption {self.sequence}")
-            reply_pkt = self.make_reply_pkt(self.sequence,
-                                            ord(self.sequence))
+            corr_ack_seq_detector = '0' if self.sequence == '1' else '1'
+            rec_seq_num = self.sequence
+            reply_pkt = self.make_reply_pkt(corr_ack_seq_detector,
+                                            ord(corr_ack_seq_detector))
         else:
             rec_seq_num = rcv_pkt['sequence_number']
             reply_pkt = self.make_reply_pkt(rec_seq_num,
