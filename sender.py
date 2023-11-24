@@ -1,3 +1,4 @@
+from colorama import init, Fore
 class SenderProcess:
     """ Represent the sender process in the application layer  """
 
@@ -62,8 +63,8 @@ class RDTSender:
         :param reply: a python dictionary represent a reply sent by the receiver
         :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
         """
-        return (reply['checksum'] != ord(reply['ack']) or
-                reply['ack'] != self.sequence)
+        return ((reply['checksum'] != ord(reply['ack'])
+                 or not self.is_expected_seq(reply, self.sequence)))
         pass
 
     @staticmethod
@@ -101,18 +102,18 @@ class RDTSender:
             checksum = RDTSender.get_checksum(data)
             pkt = RDTSender.make_pkt(self.sequence, data, checksum)
             clonedPacket = self.clone_packet(pkt)
+
+            print(f"{Fore.BLUE}Sender: expected sequence number:{Fore.RESET} {self.sequence}")
+            print(f"{Fore.BLUE}Sender: sending:{Fore.RESET} {pkt}")
             reply = self.net_srv.udt_send(pkt)
-            print(f"Sender: expected sequence number {self.sequence}")
+            print(f"{Fore.BLUE}Sender: received :{Fore.RESET} {reply} ")
             sent = False
             while not sent:
                 if self.is_corrupted(reply, self) or not checksum:
                     reply = self.net_srv.udt_send(clonedPacket)
-                    print("corruption detected in sender")
-                    print(f"Sender: sending {clonedPacket}")
+                    print(f"{Fore.BLUE}Sender: received :{Fore.RESET} {reply} ")
                 else:
-                    print(f'{clonedPacket} sent successfully')
                     self.sequence = '0' if self.sequence == '1' else '1'
                     sent = True
-            print(f"expected sequence number {self.sequence}")
         print(f'Sender Done!')
         return

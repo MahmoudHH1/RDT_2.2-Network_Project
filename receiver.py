@@ -1,3 +1,4 @@
+from colorama import init, Fore
 class ReceiverProcess:
     """ Represent the receiver process in the application layer  """
     __buffer = list()
@@ -35,9 +36,7 @@ class RDTReceiver:
             :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
         """
         # TODO provide your own implementation
-        print(RDTReceiver.get_sequence(self) != packet['sequence_number'])
-        print(packet['checksum'] != ord(packet['data']))
-        return (RDTReceiver.get_sequence(self) != packet['sequence_number']
+        return (not self.is_expected_seq(packet, self.sequence)
                 or packet['checksum'] != ord(packet['data']))
         pass
 
@@ -71,18 +70,22 @@ class RDTReceiver:
         :return: the reply packet
         """
         # TODO provide your own implementation
-        if self.is_corrupted(rcv_pkt, self) :
-            rec_seq_num = rcv_pkt['sequence_number']
-            print(f"corruption detected in receiver {rcv_pkt}")
+        reply_pkt = {}
+        if self.is_corrupted(rcv_pkt, self):
+            print(f"{Fore.RED}network_layer: corruption occurred {rcv_pkt} {Fore.RESET} ")
             self.sequence = '0' if self.sequence == '1' else '1'
+            print(f"after corruption {self.sequence}")
+            reply_pkt = self.make_reply_pkt(self.sequence,
+                                            ord(self.sequence))
+        else:
+            rec_seq_num = rcv_pkt['sequence_number']
 
-        reply_pkt = self.make_reply_pkt(self.sequence,
-                                        ord(self.sequence))
-
-        expecting_seq = self.sequence
-        print(f"Receiver: Expected sequence number {expecting_seq}")
-        print(f"Receiver: reply with {reply_pkt}")
-        #if not self.is_expected_seq(reply_pkt , rcv_pkt['sequence_number']):
+            reply_pkt = self.make_reply_pkt(rec_seq_num,
+                                            ord(rec_seq_num))
+            self.sequence = '0' if rec_seq_num == '1' else '1'
+        expecting_seq = rec_seq_num
+        print(f"{Fore.GREEN}Receiver: Expected sequence number:{Fore.RESET} {expecting_seq}")
+        print(f"{Fore.GREEN}Receiver: reply with{Fore.RESET}: {reply_pkt}")
 
         # deliver the data to the process in the application layer
         ReceiverProcess.deliver_data(rcv_pkt['data'])
