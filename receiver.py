@@ -79,7 +79,6 @@ class RDTReceiver:
                                             ord(self.sequence))
         else:
             rec_seq_num = rcv_pkt['sequence_number']
-
             reply_pkt = self.make_reply_pkt(rec_seq_num,
                                             ord(rec_seq_num))
             self.sequence = '0' if rec_seq_num == '1' else '1'
@@ -89,5 +88,4 @@ class RDTReceiver:
 
         # deliver the data to the process in the application layer
         ReceiverProcess.deliver_data(rcv_pkt['data'])
-
         return reply_pkt
