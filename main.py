@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     SenderProcess.set_outgoing_data(msg)
 
-    print(f'Sender is sending:{Fore.BLUE}{SenderProcess.get_outgoing_data()}{Fore.RESET}')
+    print(f'{Fore.YELLOW}Sender is sending:{Fore.RESET}{Fore.BLUE}{SenderProcess.get_outgoing_data()}{Fore.RESET}')
 
     network_serv = NetworkLayer(reliability=prob_to_deliver, delay=delay, pkt_corrupt=corrupt_pkt,
                                 ack_corrupt=corrupt_ack)
