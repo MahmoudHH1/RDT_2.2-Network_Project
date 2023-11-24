@@ -86,4 +86,7 @@ class NetworkLayer:
         if r_test and self.ack_corrupt:
             self.__corrupt_reply()
 
+        if (r_test and self.ack_corrupt) or (s_test and self.pkt_corrupt):
+              print(f"corruption occured {frame}")
+
         return self.reply

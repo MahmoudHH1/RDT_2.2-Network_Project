@@ -35,8 +35,10 @@ class RDTReceiver:
             :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
         """
         # TODO provide your own implementation
+        print(RDTReceiver.get_sequence(self) != packet['sequence_number'])
+        print(packet['checksum'] != ord(packet['data']))
         return (RDTReceiver.get_sequence(self) != packet['sequence_number']
-                or packet['checksum'] != ord(RDTReceiver.get_sequence(self)))
+                or packet['checksum'] != ord(packet['data']))
         pass
 
     @staticmethod
@@ -69,17 +71,20 @@ class RDTReceiver:
         :return: the reply packet
         """
         # TODO provide your own implementation
-        if self.is_corrupted(rcv_pkt, self):
+        if self.is_corrupted(rcv_pkt, self) :
             rec_seq_num = rcv_pkt['sequence_number']
-            #print(ord(rec_seq_num) , rec_seq_num)
-            new_seq_num = '1' if rec_seq_num == '0' else '0'
-            reply_pkt = self.make_reply_pkt(new_seq_num, ord(new_seq_num))
+            print(f"corruption detected in receiver {rcv_pkt}")
+            self.sequence = '0' if self.sequence == '1' else '1'
 
+        reply_pkt = self.make_reply_pkt(self.sequence,
+                                        ord(self.sequence))
+
+        expecting_seq = self.sequence
+        print(f"Receiver: Expected sequence number {expecting_seq}")
+        print(f"Receiver: reply with {reply_pkt}")
         #if not self.is_expected_seq(reply_pkt , rcv_pkt['sequence_number']):
 
         # deliver the data to the process in the application layer
         ReceiverProcess.deliver_data(rcv_pkt['data'])
 
         return reply_pkt
-
-        return None

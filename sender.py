@@ -62,10 +62,9 @@ class RDTSender:
         :param reply: a python dictionary represent a reply sent by the receiver
         :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
         """
-        return (RDTSender.get_sequence(self) != reply['ack'] or
-                reply['checksum'] != ord(RDTSender.get_sequence(self)))
+        return (reply['checksum'] != ord(reply['ack']) or
+                reply['ack'] != self.sequence)
         pass
-
 
     @staticmethod
     def is_expected_seq(reply, exp_seq):
@@ -103,17 +102,17 @@ class RDTSender:
             pkt = RDTSender.make_pkt(self.sequence, data, checksum)
             clonedPacket = self.clone_packet(pkt)
             reply = self.net_srv.udt_send(pkt)
+            print(f"Sender: expected sequence number {self.sequence}")
             sent = False
-            while self.is_corrupted(reply, self):
-                if self.is_corrupted(reply, self):
-                    print(1)
+            while not sent:
+                if self.is_corrupted(reply, self) or not checksum:
                     reply = self.net_srv.udt_send(clonedPacket)
-                elif not self.is_expected_seq(reply, self):
-                    print(2)
-                    reply = self.net_srv.udt_send(clonedPacket)
+                    print("corruption detected in sender")
+                    print(f"Sender: sending {clonedPacket}")
                 else:
+                    print(f'{clonedPacket} sent successfully')
                     self.sequence = '0' if self.sequence == '1' else '1'
-                    break
-
+                    sent = True
+            print(f"expected sequence number {self.sequence}")
         print(f'Sender Done!')
         return
