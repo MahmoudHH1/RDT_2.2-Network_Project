@@ -76,7 +76,6 @@ class NetworkLayer:
         # TODO: You may add ONLY print statements to this function for debugging purpose
         self.packet = frame
         s_test = self.__packet_corruption_probability()
-
         if s_test and self.pkt_corrupt:
             self.__corrupt_packet()
 
@@ -89,7 +88,9 @@ class NetworkLayer:
         if r_test and self.ack_corrupt:
             self.__corrupt_reply()
 
-        if (r_test and self.ack_corrupt) or (s_test and self.pkt_corrupt):
-            print(f"{Fore.RED}corruption occured {frame}")
+        if r_test and self.ack_corrupt:
+            print(f"{Fore.RED}corruption occured {self.packet}")
+        elif s_test and self.pkt_corrupt:
+            print(f"{Fore.RED}corruption occured {self.reply}")
 
         return self.reply

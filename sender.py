@@ -110,20 +110,13 @@ class RDTSender:
             print(f"{Fore.BLUE}Sender: expected sequence number:{Fore.RESET} {self.sequence}")
             print(f"{Fore.BLUE}Sender: sending:{Fore.RESET} {pkt}")
             reply = self.net_srv.udt_send(pkt)
-            # print(reply['checksum'], "checksum3")
-            # print(ord(reply['ack']), "ascii ack3")
             seqNumBeforeCorruption = self.sequence
-            # if not ord(reply['ack']) == reply['checksum']:  # reply corrupted
-            #    print(f"{Fore.RED}network_layer: corruption occurred {reply} {Fore.RESET} ")
             print(f"{Fore.BLUE}Sender: received :{Fore.RESET} {reply} ")
-            while ((not self.is_expected_seq(reply, self.sequence)) or
-                   self.is_corrupted(reply)):
+            while (not self.is_expected_seq(reply, self.sequence)) or self.is_corrupted(reply):
                 print(f"{Fore.BLUE}Sender: expected sequence number:{Fore.RESET} {clonedPacket['sequence_number']}")
                 print(f"{Fore.BLUE}Sender: sending:{Fore.RESET} {clonedPacket}")
                 pkt = self.clone_packet(clonedPacket)
                 reply = self.net_srv.udt_send(pkt)
-                #    if self.is_corrupted(reply, self):
-                #        print(f"{Fore.RED}network_layer: corruption occurred {reply} {Fore.RESET} ")
                 print(f"{Fore.BLUE}Sender: received :{Fore.RESET} {reply} ")
             self.sequence = '0' if seqNumBeforeCorruption == '1' else '1'
         print(f'Sender Done!')
