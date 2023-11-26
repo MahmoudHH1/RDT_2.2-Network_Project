@@ -66,7 +66,7 @@ class NetworkLayer:
 
     def udt_send(self, frame):
         """ implement the delivery service of the unreliable network layer
-        :param frame: a python dictionary represent the a sender's packet or a receiver's reply
+        :param frame: a python dictionary represent the  a sender's packet or a receiver's reply
         :return: the receiver's reply as a python dictionary returned to the sender
         """
 
