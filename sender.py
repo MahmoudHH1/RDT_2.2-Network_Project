@@ -119,5 +119,5 @@ class RDTSender:
                 reply = self.net_srv.udt_send(pkt)
                 print(f"{Fore.BLUE}Sender: received :{Fore.RESET} {reply} ")
             self.sequence = '0' if seqNumBeforeCorruption == '1' else '1'
-        print(f'Sender Done!')
+        print(f'{Fore.YELLOW}Sender Done!{Fore.RESET}')
         return

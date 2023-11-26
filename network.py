@@ -79,6 +79,9 @@ class NetworkLayer:
         if s_test and self.pkt_corrupt:
             self.__corrupt_packet()
 
+        if s_test and self.pkt_corrupt:
+            print(f"{Fore.RED}corruption occured {self.packet}")
+
         time.sleep(self.delay)
 
         # bridge|connect the RDT sender and receiver
@@ -89,8 +92,6 @@ class NetworkLayer:
             self.__corrupt_reply()
 
         if r_test and self.ack_corrupt:
-            print(f"{Fore.RED}corruption occured {self.packet}")
-        elif s_test and self.pkt_corrupt:
             print(f"{Fore.RED}corruption occured {self.reply}")
 
         return self.reply

@@ -27,4 +27,4 @@ if __name__ == '__main__':
     rdt_sender = RDTSender(network_serv)
     rdt_sender.rdt_send(SenderProcess.get_outgoing_data())
 
-    print(f'Receiver received: {ReceiverProcess.get_buffer()}')
+    print(f'{Fore.YELLOW}Receiver received:{Fore.RESET} {ReceiverProcess.get_buffer()}')
