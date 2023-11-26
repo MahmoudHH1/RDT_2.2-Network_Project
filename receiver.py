@@ -32,7 +32,7 @@ class RDTReceiver:
         return self.sequence
 
     @staticmethod
-    def is_corrupted(packet):
+    def is_corrupted(packet, self):
         """ Check if the received packet from sender is corrupted or not
             :param packet: a python dictionary represent a packet received from the sender
             :return: True -> if the reply is corrupted | False ->  if the reply is NOT corrupted
@@ -40,7 +40,8 @@ class RDTReceiver:
         # TODO provide your own implementation
         # print(packet['checksum'], "checksum11")
         # print(ord(packet['data']), "ascii ack11")
-        return not packet['checksum'] == ord(packet['data'])
+        return (not self.is_expected_seq(packet, self.sequence)
+                or packet['checksum'] != ord(packet['data']))
         pass
 
     @staticmethod
@@ -78,13 +79,15 @@ class RDTReceiver:
         reply_pkt = {}
         rec_seq_num = ''
         # if self.is_corrupted(rcv_pkt, self):
-        if self.is_corrupted(rcv_pkt) or not self.is_expected_seq(rcv_pkt, self):
-            print(f"{Fore.RED}network_layer: corruption occurred {rcv_pkt} {Fore.RESET} ")
+        if not (rcv_pkt['checksum'] == ord(rcv_pkt['data']) or
+                (rcv_pkt['sequence_number'] not in {'0', '1'})):
+            #print(f"{Fore.RED}network_layer: corruption occurred {rcv_pkt} {Fore.RESET} ")
             corr_ack_seq_detector = '0' if self.sequence == '1' else '1'
             rec_seq_num = self.sequence
             reply_pkt = self.make_reply_pkt(corr_ack_seq_detector,
                                             ord(corr_ack_seq_detector))
         else:
+            ReceiverProcess.deliver_data(rcv_pkt['data'])
             rec_seq_num = rcv_pkt['sequence_number']
             reply_pkt = self.make_reply_pkt(rec_seq_num,
                                             ord(rec_seq_num))
@@ -94,5 +97,5 @@ class RDTReceiver:
         print(f"{Fore.GREEN}Receiver: reply with{Fore.RESET}: {reply_pkt}")
 
         # deliver the data to the process in the application layer
-        ReceiverProcess.deliver_data(rcv_pkt['data'])
+
         return reply_pkt
