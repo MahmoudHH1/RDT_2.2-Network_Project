@@ -83,15 +83,25 @@ class NetworkLayer:
             print(f"{Fore.RED}corruption occured {self.packet}")
 
         time.sleep(self.delay)
-
         # bridge|connect the RDT sender and receiver
-        self.reply = self.recv.rdt_rcv(self.packet)
+        start_time = time.time()  # Record the start time of sleep
+        time.sleep(self.delay)
+        end_time = time.time()  # Record the end time of sleep
 
-        r_test = self.__packet_corruption_probability()
-        if r_test and self.ack_corrupt:
-            self.__corrupt_reply()
+        elapsed_time = end_time - start_time
+        if elapsed_time > 2:
+            return 0
+        else:
+            self.reply = self.recv.rdt_rcv(self.packet)
 
-        if r_test and self.ack_corrupt:
-            print(f"{Fore.RED}corruption occured {self.reply}")
+            r_test = self.__packet_corruption_probability()
+            if r_test and self.ack_corrupt:
+                self.__corrupt_reply()
+
+            if r_test and self.ack_corrupt:
+                print(f"{Fore.RED}corruption occured {self.reply}")
 
         return self.reply
+
+
+
