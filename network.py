@@ -67,6 +67,10 @@ class NetworkLayer:
         else:
             self.reply['checksum'] = chr(random.randint(ord('2'), ord('9')))
 
+    def __corrupt_delay(self):
+        ran = random.randint(0, int(self.delay))
+        self.delay = ran
+
     def udt_send(self, frame):
         """ implement the delivery service of the unreliable network layer
         :param frame: a python dictionary represent the  a sender's packet or a receiver's reply
@@ -79,19 +83,20 @@ class NetworkLayer:
         if s_test and self.pkt_corrupt:
             self.__corrupt_packet()
 
-        if s_test and self.pkt_corrupt:
-            print(f"{Fore.RED}corruption occured {self.packet}")
-
-        time.sleep(self.delay)
-        # bridge|connect the RDT sender and receiver
+        self.__corrupt_delay()
         start_time = time.time()  # Record the start time of sleep
         time.sleep(self.delay)
         end_time = time.time()  # Record the end time of sleep
-
         elapsed_time = end_time - start_time
-        if elapsed_time > 2:
+        if  int(elapsed_time) > 2:
+            print(f"{Fore.RED}Time out: Resend the message{Fore.RESET}")
             return 0
+        
         else:
+            time.sleep(self.delay)
+            if s_test and self.pkt_corrupt:
+                print(f"{Fore.RED}corruption occured {self.packet}")
+            # bridge|connect the RDT sender and receiver
             self.reply = self.recv.rdt_rcv(self.packet)
 
             r_test = self.__packet_corruption_probability()
@@ -102,6 +107,3 @@ class NetworkLayer:
                 print(f"{Fore.RED}corruption occured {self.reply}")
 
         return self.reply
-
-
-
