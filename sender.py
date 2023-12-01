@@ -111,11 +111,14 @@ class RDTSender:
             print(f"{Fore.BLUE}Sender: sending:{Fore.RESET} {pkt}")
             reply = self.net_srv.udt_send(pkt)
             while reply == 0:
+                print("22")
                 print(f"{Fore.BLUE}Sender: expected sequence number:{Fore.RESET} {self.sequence}")
                 print(f"{Fore.BLUE}Sender: sending:{Fore.RESET} {pkt}")
                 pkt = self.clone_packet(clonedPacket)
                 reply = self.net_srv.udt_send(pkt)
+
             else:
+                print("33")
                 seqNumBeforeCorruption = self.sequence
                 print(f"{Fore.BLUE}Sender: received :{Fore.RESET} {reply} ")
                 while (not self.is_expected_seq(reply, self.sequence)) or self.is_corrupted(reply):

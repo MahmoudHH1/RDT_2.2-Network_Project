@@ -69,6 +69,7 @@ class NetworkLayer:
 
     def __corrupt_delay(self):
         ran = random.randint(0, int(self.delay))
+        print(ran)
         self.delay = ran
 
     def udt_send(self, frame):
